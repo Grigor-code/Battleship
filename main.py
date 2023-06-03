@@ -4,16 +4,16 @@ import random
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
-block_size = 50
+block_size = 40
 left_margin = 100
-upper_margin = 80
+upper_margin = 100
 
 size = (left_margin+30*block_size, upper_margin+15*block_size)
 
 pygame.init()
 
 screen = pygame.display.set_mode(size)
-pygame.display.set_caption("Morskoy Boy")
+pygame.display.set_caption("Морской бой")
 
 font_size = int(block_size / 1.5)
 
@@ -136,13 +136,13 @@ def draw_grid():
                                   upper_margin + i*block_size + (block_size//2 - num_ver_height//2)))
             # Hor letters grid1
             screen.blit(letters_hor, (left_margin + i*block_size + (block_size //
-                                                                    2 - letters_hor_width//2), upper_margin + 10*block_size))
+                                                                    2 - letters_hor_width//2), upper_margin + 10.2*block_size))
             # Ver num grid2
             screen.blit(num_ver, (left_margin - (block_size//2+num_ver_width//2) + 15 *
                                   block_size, upper_margin + i*block_size + (block_size//2 - num_ver_height//2)))
             # Hor letters grid2
             screen.blit(letters_hor, (left_margin + i*block_size + (block_size//2 -
-                                                                    letters_hor_width//2) + 15*block_size, upper_margin + 10*block_size))
+                                                                    letters_hor_width//2) + 15*block_size, upper_margin + 10.2*block_size))
 
 
 def main():
