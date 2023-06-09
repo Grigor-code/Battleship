@@ -428,6 +428,7 @@ def computer_shoots(set_to_shoot_from):
     """
     pygame.time.delay(500)
 
+
     computer_fired_block = random.choice(tuple(set_to_shoot_from))
     computer_available_to_fire_set.discard(computer_fired_block)
 
@@ -712,6 +713,9 @@ undo_message = "Для отмены последнего корабля нажм
 undo_button_place = left_margin + 12 * block_size
 undo_button = Button(undo_button_place, "ОТМЕНА", undo_message)
 
+def check(attack):
+    if attack in computer_available_to_fire_set: return False
+    else:return True
 def attakbot():
     global rindex
 
@@ -729,14 +733,33 @@ def attakbot():
     if around_last_computer_hit_set:
             set_to_shoot_from = around_last_computer_hit_set
 
+
     fired_block = computer_shoots(set_to_shoot_from)
+    for variant in variant1:
+        if fired_block in variant:
+            a=variant1.index(variant)
+            variant1[a].discard(fired_block)
+            if not variant1[a]:
+                variant1.pop(a)
+    for variant in variant2:
+        if fired_block in variant:
+            a = variant2.index(variant)
+            variant2[a].discard(fired_block)
+            if not variant2[a]:
+                variant2.pop(a)
+    for variant in variant2:
+        if fired_block in variant:
+            a=variant2.index(variant)
+            variant2[a].discard(fired_block)
+            if not variant2[a]:
+                variant2.pop(a)
 
 
 
 
 
 
-    if isFourLive > 0:
+    """if isFourLive > 0:
         variant1[rindex].discard(fired_block)
         if not variant1[rindex]:
             variant1.pop(rindex)
@@ -748,6 +771,7 @@ def attakbot():
         variant3[rindex].discard(fired_block)
         if not variant3[rindex]:
             variant3.pop(rindex)
+    """
     return fired_block
 
 def main():
