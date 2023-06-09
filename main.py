@@ -427,8 +427,12 @@ def computer_shoots(set_to_shoot_from):
     Randomly chooses a block from available to shoot from set
     """
     pygame.time.delay(500)
+
     computer_fired_block = random.choice(tuple(set_to_shoot_from))
     computer_available_to_fire_set.discard(computer_fired_block)
+
+
+
     return computer_fired_block
 
 
@@ -708,6 +712,43 @@ undo_message = "Для отмены последнего корабля нажм
 undo_button_place = left_margin + 12 * block_size
 undo_button = Button(undo_button_place, "ОТМЕНА", undo_message)
 
+def attakbot():
+    global rindex
+
+    if isFourLive > 0:
+            rindex = random.randrange(len(variant1))
+            set_to_shoot_from = variant1[rindex]
+    elif isTreeLive > 0:
+            rindex = random.randrange(len(variant2))
+            set_to_shoot_from = variant2[rindex]
+    elif isTwoLive > 0:
+            rindex = random.randrange(len(variant3))
+            set_to_shoot_from = variant3[rindex]
+    else:
+            set_to_shoot_from = computer_available_to_fire_set
+    if around_last_computer_hit_set:
+            set_to_shoot_from = around_last_computer_hit_set
+
+    fired_block = computer_shoots(set_to_shoot_from)
+
+
+
+
+
+
+    if isFourLive > 0:
+        variant1[rindex].discard(fired_block)
+        if not variant1[rindex]:
+            variant1.pop(rindex)
+    elif isTreeLive > 0:
+        variant2[rindex].discard(fired_block)
+        if not variant2[rindex]:
+            variant2.pop(rindex)
+    elif isTwoLive > 0:
+        variant3[rindex].discard(fired_block)
+        if not variant3[rindex]:
+            variant3.pop(rindex)
+    return fired_block
 
 def main():
     global rindex
@@ -871,44 +912,15 @@ def main():
                     show_message_at_rect_center(
                         "ВЫСТРЕЛ ЗА ПРЕДЕЛЫ СЕТКИ!", message_rect_computer)
         if computer_turn:
-            checkIN=True
-            while(checkIN):
-                if isFourLive > 0:
-                    rindex = random.randrange(len(variant1))
-                    set_to_shoot_from = variant1[rindex]
-                elif isTreeLive > 0:
-                    rindex = random.randrange(len(variant2))
-                    set_to_shoot_from = variant2[rindex]
-                elif isTwoLive > 0:
-                    rindex = random.randrange(len(variant3))
-                    set_to_shoot_from = variant3[rindex]
-                else:
-                    set_to_shoot_from = computer_available_to_fire_set
-                if(set_to_shoot_from<=computer_available_to_fire_set):checkIN=False
-
-                if around_last_computer_hit_set:
-                    set_to_shoot_from = around_last_computer_hit_set
-
-                fired_block = computer_shoots(set_to_shoot_from)
-                computer_turn = check_hit_or_miss(
+            fired_block=attakbot()
+            computer_turn = check_hit_or_miss(
                     fired_block, human_ships_working, True, human_ships_to_draw, human_ships_set)
-                if isFourLive > 0:
-                    variant1[rindex].discard(fired_block)
-                    if not variant1[rindex]:
-                        variant1.pop(rindex)
-                elif isTreeLive > 0:
-                    variant2[rindex].discard(fired_block)
-                    if not variant2[rindex]:
-                        variant2.pop(rindex)
-                elif isTwoLive > 0:
-                    variant3[rindex].discard(fired_block)
-                    if not variant3[rindex]:
-                        variant3.pop(rindex)
 
-                draw_from_dotted_set(dotted_set)
-                draw_hit_blocks(hit_blocks)
-                screen.fill(WHITE, message_rect_human)
-                show_message_at_rect_center(
+
+            draw_from_dotted_set(dotted_set)
+            draw_hit_blocks(hit_blocks)
+            screen.fill(WHITE, message_rect_human)
+            show_message_at_rect_center(
                     f"ПОСЛЕДНИЙ ХОД КОМПЬЮТЕРА: {LETTERS[fired_block[0] - 16] + str(fired_block[1])}",
                     message_rect_human, color=BLACK)
 
