@@ -1,7 +1,7 @@
 import pygame
 import random
 import copy
-*.css linguist-language=Python
+
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 GREEN_BLUE = (0, 153, 153)
