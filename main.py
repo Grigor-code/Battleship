@@ -7,6 +7,7 @@ BLACK = (0, 0, 0)
 GREEN_BLUE = (0, 153, 153)
 LIGHT_GRAY = (192, 192, 192)
 RED = (255, 0, 0)
+LIME=(0, 255, 0)
 
 block_size = 50
 left_margin = 5 * block_size
@@ -83,6 +84,8 @@ font_size = int(block_size / 1.5)
 font = pygame.font.SysFont('notosans', font_size)
 game_over_font_size = 3 * block_size
 game_over_font = pygame.font.SysFont('notosans', game_over_font_size)
+game_win_font=pygame.font.SysFont('notosans', game_over_font_size,GREEN_BLUE)
+
 
 ### COMPUTER DATA ###
 computer_available_to_fire_set = {(x, y)
@@ -427,13 +430,10 @@ def computer_shoots(set_to_shoot_from):
     Randomly chooses a block from available to shoot from set
     """
     pygame.time.delay(500)
-
-
     computer_fired_block = random.choice(tuple(set_to_shoot_from))
     computer_available_to_fire_set.discard(computer_fired_block)
-
-
-
+    deletevar(computer_fired_block)
+    print(computer_fired_block)
     return computer_fired_block
 
 
@@ -468,7 +468,7 @@ def check_hit_or_miss(fired_block, opponents_ships_list, computer_turn, opponent
                     isTreeLive=isTreeLive-1
                 if len(elem) == 1:
                     isTwoLive=isTwoLive-1
-                print(isFourLive," ",isTreeLive," ",isTwoLive )
+
 
                 last_hits_list.append(fired_block)
                 update_around_last_computer_hit(fired_block, True)
@@ -510,10 +510,13 @@ def update_around_last_computer_hit(fired_block, computer_hits):
     global around_last_computer_hit_set, computer_available_to_fire_set
     if computer_hits and fired_block in around_last_computer_hit_set:
         around_last_computer_hit_set = computer_hits_twice()
+        deletevar(fired_block)
+        print(fired_block)
     elif computer_hits and fired_block not in around_last_computer_hit_set:
         computer_first_hit(fired_block)
     elif not computer_hits:
         around_last_computer_hit_set.discard(fired_block)
+
 
     around_last_computer_hit_set -= dotted_set_for_computer_not_to_shoot
     around_last_computer_hit_set -= hit_blocks_for_computer_not_to_shoot
@@ -531,12 +534,16 @@ def computer_first_hit(fired_block):
     x_hit, y_hit = fired_block
     if x_hit > 16:
         around_last_computer_hit_set.add((x_hit - 1, y_hit))
+
     if x_hit < 25:
         around_last_computer_hit_set.add((x_hit + 1, y_hit))
+
     if y_hit > 1:
         around_last_computer_hit_set.add((x_hit, y_hit - 1))
+
     if y_hit < 10:
         around_last_computer_hit_set.add((x_hit, y_hit + 1))
+
 
 
 def computer_hits_twice():
@@ -557,13 +564,18 @@ def computer_hits_twice():
         if x1 == x2:
             if y1 > 1:
                 new_around_last_hit_set.add((x1, y1 - 1))
+
             if y2 < 10:
                 new_around_last_hit_set.add((x1, y2 + 1))
+
         elif y1 == y2:
             if x1 > 16:
                 new_around_last_hit_set.add((x1 - 1, y1))
+
             if x2 < 25:
                 new_around_last_hit_set.add((x2 + 1, y1))
+
+
     return new_around_last_hit_set
 
 
@@ -582,11 +594,15 @@ def update_dotted_and_hit_sets(fired_block, computer_turn, diagonal_only=True):
     hit_blocks_for_computer_not_to_shoot.add(fired_block)
     # Adds hit blocks on either grid1 (x:1-10) or grid2 (x:16-25)
     hit_blocks.add(fired_block)
+    deletevar(fired_block)
+    print(fired_block)
     # Adds blocks in diagonal or all-around a block to repsective sets
     for i in range(-1, 2):
         for j in range(-1, 2):
             if (not diagonal_only or i != 0 and j != 0) and a < x + i < b and 0 < y + j < 11:
                 add_missed_block_to_dotted_set((x + i, y + j))
+                deletevar((x + i, y + j))
+                print((x + i, y + j))
     dotted_set -= hit_blocks
 
 
@@ -713,28 +729,8 @@ undo_message = "Для отмены последнего корабля нажм
 undo_button_place = left_margin + 12 * block_size
 undo_button = Button(undo_button_place, "ОТМЕНА", undo_message)
 
-def check(attack):
-    if attack in computer_available_to_fire_set: return False
-    else:return True
-def attakbot():
-    global rindex
 
-    if isFourLive > 0:
-            rindex = random.randrange(len(variant1))
-            set_to_shoot_from = variant1[rindex]
-    elif isTreeLive > 0:
-            rindex = random.randrange(len(variant2))
-            set_to_shoot_from = variant2[rindex]
-    elif isTwoLive > 0:
-            rindex = random.randrange(len(variant3))
-            set_to_shoot_from = variant3[rindex]
-    else:
-            set_to_shoot_from = computer_available_to_fire_set
-    if around_last_computer_hit_set:
-            set_to_shoot_from = around_last_computer_hit_set
-
-
-    fired_block = computer_shoots(set_to_shoot_from)
+def deletevar(fired_block):
     for variant in variant1:
         if fired_block in variant:
             a=variant1.index(variant)
@@ -754,9 +750,50 @@ def attakbot():
             if not variant2[a]:
                 variant2.pop(a)
 
+def deleteset(set_delete):
+    for variant in variant1:
+        if set_delete&variant:
+            a=variant1.index(variant)
+            variant1[a]=variant1[a]-set_delete
+            if not variant1[a]:
+                variant1.pop(a)
+    for variant in variant2:
+        if set_delete&variant:
+            a=variant2.index(variant)
+            variant1[a]=variant2[a]-set_delete
+            if not variant2[a]:
+                variant2.pop(a)
+    for variant in variant3:
+        if set_delete&variant:
+            a=variant3.index(variant)
+            variant3[a]=variant3[a]-set_delete
+            if not variant3[a]:
+                variant3.pop(a)
 
 
+def attakbot():
+    global rindex
 
+    if isFourLive > 0:
+
+            try:
+                rindex = random.randrange(len(variant1))
+                set_to_shoot_from = variant1[rindex]
+            except ValueError:
+                rindex = random.randrange(len(variant1)+1)
+
+
+    elif isTreeLive > 0:
+            rindex = random.randrange(len(variant2))
+            set_to_shoot_from = variant2[rindex]
+    elif isTwoLive > 0:
+            rindex = random.randrange(len(variant3))
+            set_to_shoot_from = variant3[rindex]
+    else:
+            set_to_shoot_from = computer_available_to_fire_set
+    if around_last_computer_hit_set:
+            set_to_shoot_from = around_last_computer_hit_set
+    fired_block = computer_shoots(set_to_shoot_from)
 
 
     """if isFourLive > 0:
@@ -939,6 +976,8 @@ def main():
             fired_block=attakbot()
             computer_turn = check_hit_or_miss(
                     fired_block, human_ships_working, True, human_ships_to_draw, human_ships_set)
+            deleteset(dotted_set)
+            deleteset(hit_blocks)
 
 
             draw_from_dotted_set(dotted_set)
@@ -952,10 +991,10 @@ def main():
 
         if not computer.ships_set:
             show_message_at_rect_center(
-                "ВЫ ВЫИГРАЛИ!", (0, 0, size[0], size[1]), game_over_font)
+                "ВЫ ВЫИГРАЛИ!", (0, 0, size[0], size[1]), game_over_font,color=LIME)
         if not human_ships_set:
             show_message_at_rect_center(
-                "ВЫ ПРОИГРАЛИ!", (0, 0, size[0], size[1]), game_over_font)
+                "ВЫ ПРОИГРАЛИ!", (0, 0, size[0], size[1]), game_over_font,color=RED)
         pygame.display.update()
 
 
